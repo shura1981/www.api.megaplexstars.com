@@ -8,10 +8,13 @@ require_once 'partials/headers.php';
 require_once 'validaciones/handle-error.php';
 require_once 'validaciones/validator.php';
 
-\Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
 
+define('URL',$_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+
+
 require_once 'routes/productos.php';
+require_once 'routes/html.php';
 
 $app->run();//Inicia el Api
 

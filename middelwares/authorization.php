@@ -1,8 +1,11 @@
 <?php
-use \Firebase\JWT\JWT;
-use Firebase\JWT\Key;
+require_once 'exceptions/jwt-exception.php';
+require_once 'jwt/decode_encode.php';
 
+use ApiMegaplex\Exceptions\JwtException;
+use ApiMegaplex\Jwt\EncodeDecode;
 
+use stdClass;
 
 
 
@@ -31,29 +34,15 @@ function tokenJwt()
 
     // $jwt = trim(str_replace('Bearer', '', $header));
     $jwt = $header;
-
     try {
-        $key = $_ENV['KEY_SECRET']; // La misma clave que usaste para codificar
-        $decoded = JWT::decode($jwt, new Key($key, 'HS256'));
-        $result = array('data' => $decoded);
+        $decoded = EncodeDecode::decode($jwt);
         // Si el token es válido y no ha expirado, podrás acceder a los datos del payload
         // añadir resultado al request
         $app->container->set('jwt', new stdClass());
         $app->container->jwt->decodedToken = $decoded;
-
         // ahora sigue a la próxima función de middleware o ruta
-
-    } catch (\Firebase\JWT\ExpiredException $e) {
-        // Manejar la excepción si el token ha expirado
-        echo handle_error($app, $e, "El token ha expirado", 401);
-        $app->stop();
-    } catch (Exception $e) {
-        // Manejar otras excepciones (token inválido, error en la decodificación, etc.)
-        if ($e->getMessage() == "Signature verification failed") {
-            echo handle_error($app, $e, "El token es inválido", 401);
-            $app->stop();
-        }
-        echo handle_error($app, $e);
+    } catch (JwtException $e) {
+        echo handle_error($app, $e, "Error al validar el token", $e->gethttpCode());
         $app->stop();
     }
 }

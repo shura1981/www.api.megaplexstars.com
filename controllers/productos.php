@@ -2,8 +2,9 @@
 
 namespace ApiMegaplex\Controllers;
 
-use \Firebase\JWT\JWT;
-use Firebase\JWT\Key;
+require_once 'jwt/decode_encode.php';
+
+use ApiMegaplex\Jwt\EncodeDecode;
 use Exception;
 
 
@@ -23,11 +24,8 @@ class Productos
     static function decodeJwt()
     {
         $app = \Slim\Slim::getInstance();
-
-
         try {
             $decodedToken = $app->container->jwt->decodedToken;
-
             // Si el token es válido y no ha expirado, podrás acceder a los datos del payload
             $app->response()->status(200);
             echo json_encode($decodedToken, JSON_NUMERIC_CHECK);
@@ -40,31 +38,17 @@ class Productos
     static function generateJwt()
     {
         $app = \Slim\Slim::getInstance();
-
-        $data = json_decode($app->request()->getBody());
-
-        if (
-            !validarCampo($data, 'correo', 'El campo correo es requerido') ||
-            !validarCampo($data, 'rol', 'El campo rol es requerido') || !validarCampo($data, 'password', 'El campo password es requerido')
-        ) {
-            return;
-        }
-
-
         try {
-            $key = $_ENV['KEY_SECRET']; // Asegúrate de usar una clave segura y única
-            $time = time() + (60 * 60); // 1 hora de expiración
+            $data = json_decode($app->request()->getBody());
 
-            $correo = $data->correo;
-            $rol = $data->rol;
-
-            $payload = array(
-                "user" => array("correo" => $correo, "rol" => $rol),  // Emisor
-                "iat" => time(),                   // Tiempo de creación
-                "exp" => $time,         // Expiración (1 hora en este caso)
-                // Puedes agregar más campos según lo necesites
-            );
-            $jwt = JWT::encode($payload, $key, 'HS256');
+            if (
+                !validarCampo($data, 'correo', 'El campo correo es requerido') ||
+                !validarCampo($data, 'rol', 'El campo rol es requerido') || !validarCampo($data, 'password', 'El campo password es requerido')
+            ) {
+                return;
+            }
+    
+            $jwt = EncodeDecode::encode($data);
             $result = array('token' => $jwt);
             $app->response()->status(201);
             echo json_encode($result, JSON_NUMERIC_CHECK);

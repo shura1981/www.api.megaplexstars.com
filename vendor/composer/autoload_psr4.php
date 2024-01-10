@@ -15,4 +15,5 @@ return array(
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'CorsSlim\\' => array($vendorDir . '/palanik/corsslim'),
+    'ApiMegaplex\\Controllers\\' => array($baseDir . '/controllers'),
 );
