@@ -4,6 +4,7 @@ namespace ApiMegaplex\Controllers;
 
 use \Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Exception;
 
 
 class Productos
@@ -14,49 +15,31 @@ class Productos
         $nombre = $app->request()->params('nombre');
         $dbHost = $_ENV['DB_HOST'];
         $path = realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'public');
+        $decodedToken = $app->container->jwt->decodedToken;
 
-        $result = array('saludo' => "Hola $nombre", "dir" => __DIR__, "dbHost" => $dbHost, "path" => $path);
+        $result = array('saludo' => "Hola $nombre", "dir" => __DIR__, "dbHost" => $dbHost, "path" => $path, "jwt" => $decodedToken);
         echo json_encode($result, JSON_NUMERIC_CHECK);
     }
     static function decodeJwt()
     {
-        global $app;
-        // obtener jwt de la cabecera de autorización
-        $header = (array_key_exists('Authorization', getallheaders())) ? getallheaders()['Authorization'] : null;
-        if ($header == null) {
-            $result = array('error' => "No se ha enviado el token");
-            echo json_encode($result);
-            return;
-        }
+        $app = \Slim\Slim::getInstance();
 
-        // $jwt = trim(str_replace('Bearer', '', $header));
-        $jwt = $header;
 
         try {
-            $key = $_ENV['KEY_SECRET']; // La misma clave que usaste para codificar
-            $decoded = JWT::decode($jwt, new Key($key, 'HS256'));
-            $result = array('data' => $decoded);
+            $decodedToken = $app->container->jwt->decodedToken;
+
             // Si el token es válido y no ha expirado, podrás acceder a los datos del payload
             $app->response()->status(200);
-            echo json_encode($result, JSON_NUMERIC_CHECK);
-        } catch (\Firebase\JWT\ExpiredException $e) {
-            // Manejar la excepción si el token ha expirado
-            echo handle_error($app, $e, "El token ha expirado", 401);
-        } catch (\Exception $e) {
+            echo json_encode($decodedToken, JSON_NUMERIC_CHECK);
+        } catch (Exception $e) {
             // Manejar otras excepciones (token inválido, error en la decodificación, etc.)
-            if ($e->getMessage() == "Signature verification failed") {
-                echo handle_error($app, $e, "El token es inválido", 401);
-                return;
-            }
+
             echo handle_error($app, $e);
         }
     }
     static function generateJwt()
     {
-        global $app;
-        if (!validarCabecera($app)) {
-            return;
-        }
+        $app = \Slim\Slim::getInstance();
 
         $data = json_decode($app->request()->getBody());
 

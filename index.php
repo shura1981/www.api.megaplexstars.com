@@ -7,20 +7,12 @@ $dotenv->load();
 require_once 'partials/headers.php';
 require_once 'validaciones/handle-error.php';
 require_once 'validaciones/validator.php';
-require_once 'controllers/productos.php';
 
-use ApiMegaplex\Controllers\Productos;
-
+\Slim\Slim::registerAutoloader();
 $app = new \Slim\Slim();
-$app->response()->header('Content-Type', 'application/json;charset=UTF-8'); //Para que devuelva un json por defecto
 
-$app->get('/prueba', Productos::class . ':prueba');
-$app->get('/prueba-decode-jwt', Productos::class . ':decodeJwt');
-$app->post('/prueba-generate-jwt', Productos::class . ':generateJwt');
-$app->get('/productos', Productos::class . ':getProductos');
-$app->post('/productos/subir-imagen', Productos::class . ':subirImagen');
-$app->post('/productos/subir-imagen/file', Productos::class . ':subirImagenFile');
-$app->post('/productos', Productos::class . ':insertarProducto');
+require_once 'routes/productos.php';
+
 $app->run();//Inicia el Api
 
 
