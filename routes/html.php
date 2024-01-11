@@ -1,8 +1,8 @@
 <?php
-// require_once 'controllers/view-html.php';
 use ApiMegaplex\Controllers\ViewHtml;
+use ApiMegaplex\Controllers\Email;
 
-$app->get('/', function () use ($app) {
-    echo URL;
-});
-$app->get('/home', ViewHtml::class . ':home');
+$app->get('/', ViewHtml::class . ':home');
+$app->get('/login', ViewHtml::class . ':login');
+$app->get('/registre', ViewHtml::class . ':registre');
+$app->get('/correo', Email::class . ':test');

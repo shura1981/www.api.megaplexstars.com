@@ -1,6 +1,4 @@
 <?php
-require_once 'exceptions/jwt-exception.php';
-require_once 'jwt/decode_encode.php';
 
 use ApiMegaplex\Exceptions\JwtException;
 use ApiMegaplex\Jwt\EncodeDecode;

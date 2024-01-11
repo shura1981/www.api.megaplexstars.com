@@ -15,5 +15,10 @@ return array(
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Dotenv\\' => array($vendorDir . '/vlucas/phpdotenv/src'),
     'CorsSlim\\' => array($vendorDir . '/palanik/corsslim'),
+    'ApiMegaplex\\Models\\' => array($baseDir . '/models'),
+    'ApiMegaplex\\Mailer\\' => array($baseDir . '/mailer'),
+    'ApiMegaplex\\Jwt\\' => array($baseDir . '/jwt'),
+    'ApiMegaplex\\Exceptions\\' => array($baseDir . '/exceptions'),
     'ApiMegaplex\\Controllers\\' => array($baseDir . '/controllers'),
+    'ApiMegaplex\\Connections\\' => array($baseDir . '/connections'),
 );

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Email con Fondo de Luna</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .background {
+            background-color: black;
+            background-size: cover;
+            padding: 20px;
+        }
+
+        .content {
+            background: rgba(0, 0, 0, 0.5);
+            /* Fondo semi-transparente */
+            padding: 20px;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <table class="background" width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+            <td align="center">
+                <table class="content" width="100%" max-width="600" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td>
+                            <h1>Hola, {{nombre}}!</h1>
+                            <p>Hola , tienes {{edad}} años y tu profesión es {{profesion}}.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

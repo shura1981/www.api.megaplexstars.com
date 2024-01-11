@@ -2,7 +2,6 @@
 
 namespace ApiMegaplex\Controllers;
 
-require_once 'jwt/decode_encode.php';
 
 use ApiMegaplex\Jwt\EncodeDecode;
 use Exception;

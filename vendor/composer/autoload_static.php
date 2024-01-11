@@ -42,7 +42,12 @@ class ComposerStaticInite9cf201dcbfeb482a22074c6483100a4
         ),
         'A' => 
         array (
+            'ApiMegaplex\\Models\\' => 19,
+            'ApiMegaplex\\Mailer\\' => 19,
+            'ApiMegaplex\\Jwt\\' => 16,
+            'ApiMegaplex\\Exceptions\\' => 23,
             'ApiMegaplex\\Controllers\\' => 24,
+            'ApiMegaplex\\Connections\\' => 24,
         ),
     );
 
@@ -83,9 +88,29 @@ class ComposerStaticInite9cf201dcbfeb482a22074c6483100a4
         array (
             0 => __DIR__ . '/..' . '/palanik/corsslim',
         ),
+        'ApiMegaplex\\Models\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/models',
+        ),
+        'ApiMegaplex\\Mailer\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/mailer',
+        ),
+        'ApiMegaplex\\Jwt\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/jwt',
+        ),
+        'ApiMegaplex\\Exceptions\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/exceptions',
+        ),
         'ApiMegaplex\\Controllers\\' => 
         array (
             0 => __DIR__ . '/../..' . '/controllers',
+        ),
+        'ApiMegaplex\\Connections\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/connections',
         ),
     );
 

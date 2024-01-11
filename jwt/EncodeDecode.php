@@ -1,7 +1,6 @@
 <?php
 namespace ApiMegaplex\Jwt;
 
-require_once 'exceptions/jwt-exception.php';
 
 use ApiMegaplex\Exceptions\JwtException;
 use \Firebase\JWT\JWT;

@@ -8,7 +8,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ApiMegaplex\\Controllers\\": "controllers/"
+            "ApiMegaplex\\Controllers\\": "controllers/",
+            "ApiMegaplex\\Exceptions\\": "exceptions/",
+            "ApiMegaplex\\Jwt\\": "jwt/",
+            "ApiMegaplex\\Mailer\\": "mailer/",
+            "ApiMegaplex\\Connections\\": "connections/",
+            "ApiMegaplex\\Models\\": "models/"
         }
     }
 }

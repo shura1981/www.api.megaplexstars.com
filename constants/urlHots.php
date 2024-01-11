@@ -1,0 +1,2 @@
+<?php 
+define('URL_HOST',$_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); //URL HOST
