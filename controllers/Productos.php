@@ -20,7 +20,7 @@ class Productos
         $result = array('saludo' => "Hola $nombre", "dir" => __DIR__, "dbHost" => $dbHost, "path" => $path, "jwt" => $decodedToken);
         echo json_encode($result, JSON_NUMERIC_CHECK);
     }
-    static function decodeJwt()
+    static function login()
     {
         $app = \Slim\Slim::getInstance();
         try {
@@ -34,7 +34,7 @@ class Productos
             echo handle_error($app, $e);
         }
     }
-    static function generateJwt()
+    static function registre()
     {
         $app = \Slim\Slim::getInstance();
         try {
@@ -221,6 +221,7 @@ class Productos
 
             // Guardar el array en el fichero
             file_put_contents($file, json_encode($json_data, JSON_NUMERIC_CHECK));
+            
             $app->response()->status(200);
             $result = array('status' => 'true', 'message' => 'Producto actualizado o añadido');
         } catch (Exception $e) {

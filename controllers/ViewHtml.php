@@ -16,7 +16,14 @@ class ViewHtml
             return;
         }
 
-        $app->render('home.php', array('name' => 'World'));
+        $htmlContent= '<div>
+        
+        <p><b>Gracias por su compra</b>, </p>
+        <p>Su pedido ha sido recibido y se encuentra en proceso de envío.</p>
+        
+        </div>';
+        
+        $app->render('home.php', array('name' => 'Steven Realpe', 'htmlContent' => $htmlContent));
     }
 
 
