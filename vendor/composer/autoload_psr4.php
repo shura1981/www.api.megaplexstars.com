@@ -18,6 +18,7 @@ return array(
     'ApiMegaplex\\Models\\' => array($baseDir . '/models'),
     'ApiMegaplex\\Mailer\\' => array($baseDir . '/mailer'),
     'ApiMegaplex\\Jwt\\' => array($baseDir . '/jwt'),
+    'ApiMegaplex\\Io\\' => array($baseDir . '/io'),
     'ApiMegaplex\\Exceptions\\' => array($baseDir . '/exceptions'),
     'ApiMegaplex\\Controllers\\' => array($baseDir . '/controllers'),
     'ApiMegaplex\\Connections\\' => array($baseDir . '/connections'),

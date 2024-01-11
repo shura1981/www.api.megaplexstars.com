@@ -45,6 +45,7 @@ class ComposerStaticInite9cf201dcbfeb482a22074c6483100a4
             'ApiMegaplex\\Models\\' => 19,
             'ApiMegaplex\\Mailer\\' => 19,
             'ApiMegaplex\\Jwt\\' => 16,
+            'ApiMegaplex\\Io\\' => 15,
             'ApiMegaplex\\Exceptions\\' => 23,
             'ApiMegaplex\\Controllers\\' => 24,
             'ApiMegaplex\\Connections\\' => 24,
@@ -99,6 +100,10 @@ class ComposerStaticInite9cf201dcbfeb482a22074c6483100a4
         'ApiMegaplex\\Jwt\\' => 
         array (
             0 => __DIR__ . '/../..' . '/jwt',
+        ),
+        'ApiMegaplex\\Io\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/io',
         ),
         'ApiMegaplex\\Exceptions\\' => 
         array (

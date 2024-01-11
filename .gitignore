@@ -1,2 +1,5 @@
 .env
 composer.lock
+public/uploads
+public/videos
+public/images

@@ -1,79 +1,109 @@
 <?php
-// cargar autoload
 namespace ApiMegaplex\Models;
 
-require_once __DIR__ . '/../vendor/autoload.php';
-use ApiMegaplex\Connections\DatabaseIntranet;
+use ApiMegaplex\Io\IoUserJson;
+use ApiMegaplex\Exceptions\IoException;
 use Exception;
+use JsonSerializable; // Add this import statement
 
-class User
+
+class User implements JsonSerializable
 {
-    public $usuario;
-    public $id_usuario;
-    public $cargo;
-
-    public function __construct($usuario, $id_usuario, $cargo) {
-        $this->usuario = $usuario;
-        $this->id_usuario = $id_usuario;
-        $this->cargo = $cargo;
-    }
-
-    static function getUser()
+    public function jsonSerialize()
     {
+        return [
+            'correo' => $this->correo,
+            'rol' => $this->rol,
+        ];
+    }
+    public $correo;
+    public $contrasena;
+    public $rol;
 
-        $db = new DatabaseIntranet();
-
-        $id_usuario = 116;
-        try {
-            $conn = $db->openConnection();
-            $stmt = $conn->prepare("SELECT usuario, id_usuario, cargo FROM tb_empleados WHERE id_usuario = ?");
-            $stmt->bind_param("i", $id_usuario);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            // echo $result->num_rows;
-            echo $result->fetch_assoc()['usuario'];
-        } catch (Exception $e) {
-            echo 'Excepción capturada: ', $e->getMessage(), "\n";
-        } finally {
-            $db->closeConnection();
-        }
-
-
-
+    public function __construct($correo, $contrasena, $rol)
+    {
+        $this->correo = $correo;
+        $this->contrasena = $contrasena;
+        $this->rol = $rol;
     }
 
-    static function getAllUsers() {
-        $db = new DatabaseIntranet();
-    
+
+
+
+    /**
+     * Crea o actualiza un usuario.
+     * @return bool true si se actualizó, false si se añadió
+     */
+    static function createUser($correo, $contraseña, $rol): bool
+    {
         try {
-            $conn = $db->openConnection();
-            $stmt = $conn->prepare("SELECT usuario, id_usuario, cargo FROM tb_empleados");
-            $stmt->execute();
-            $result = $stmt->get_result();
-    
-            $users = [];
-            while ($row = $result->fetch_assoc()) {
-                // $users[] = $row;
-                // $users[] = (object) $row; // Convertir el array asociativo a objeto
-                $user = new User($row['usuario'], $row['id_usuario'], $row['cargo']);
-                $users[] = $user;
-            }
-            $result->free(); // Liberar el resultado
+            $user = new User($correo, $contraseña, $rol);
+            $file = $_ENV['FILE_USERS_JSON']; // Ruta del fichero JSON
+            $isSave = IoUserJson::saveJson($file, $user);
+            return $isSave;
+        } catch (IoException $e) {
+            throw new Exception($e->getMessage(), $e->gethttpCode());
+        }
+    }
+
+    /**
+     * Obtiene una lista de usuarios.
+     * 
+     * @return User[] Array de objetos User
+     */
+    static function obtenerUsuarios(): array
+    {
+        try {
+            $file = $_ENV['FILE_USERS_JSON']; // Ruta del fichero JSON
+            $users = IoUserJson::readJson($file);
             return $users;
         } catch (Exception $e) {
-            echo 'Excepción capturada: ', $e->getMessage(), "\n";
-        } finally {
-            $db->closeConnection();
+            throw new Exception($e->getMessage(), 500);
         }
     }
-    
+
+    /**
+     * Obtiene un usuario.
+     * 
+     * @return User usuario con el correo y contraseña
+     */
+    static function obtenerUsuario($correo): User
+    {
+        try {
+            $file = $_ENV['FILE_USERS_JSON']; // Ruta del fichero JSON
+            $users = IoUserJson::readJson($file);
+            $user = null;
+            // buscar el usuario con el correo en el array
+            foreach ($users as $key => $value) {
+                if ($value->correo == $correo) {
+                    $user = $value;
+                    break;
+                }
+            }
+            return $user;
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), 500);
+        }
+    }
+
+
+
+
+    // static function createUser($correo, $contrasena, $rol){
+//     $db = new DatabaseIntranet();
+//     try {
+//         $conn = $db->openConnection();
+//         $stmt = $conn->prepare("INSERT INTO tb_usuarios (correo, contrasena, rol) VALUES (?, ?, ?)");
+//         $stmt->bind_param("sss", $correo, $contrasena, $rol);
+//         $stmt->execute();
+//         $result = $stmt->get_result();
+//         echo $result->num_rows;
+//     } catch (Exception $e) {
+//         echo 'Excepción capturada: ', $e->getMessage(), "\n";
+//     } finally {
+//         $db->closeConnection();
+//     }
+// }
 
 
 }
-
-
-
-$users= User::getAllUsers();
-// echo json_encode($users);
-echo $users[0]->cargo;
-

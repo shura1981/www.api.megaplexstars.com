@@ -13,7 +13,8 @@
             "ApiMegaplex\\Jwt\\": "jwt/",
             "ApiMegaplex\\Mailer\\": "mailer/",
             "ApiMegaplex\\Connections\\": "connections/",
-            "ApiMegaplex\\Models\\": "models/"
+            "ApiMegaplex\\Models\\": "models/",
+            "ApiMegaplex\\Io\\": "io/"
         }
     }
 }

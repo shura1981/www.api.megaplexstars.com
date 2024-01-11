@@ -52,3 +52,19 @@ function validar($data, $campo, $mensajeError = '')
     }
     return true;
 }
+
+
+function validarFile($campo, $mensajeError = '')
+{
+      // Verificar si el archivo ha sido enviado
+    if (!isset($_FILES[$campo])) {
+        global $app;
+        $app->response()->status(400); // Bad Request
+        echo json_encode([
+            'status' => 'error',
+            'message' => $mensajeError ?: "El campo '$campo' no está presente o está vacío"
+        ]);
+        return false;
+    }
+    return true;
+}
