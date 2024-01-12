@@ -1,7 +1,7 @@
 <?php
 namespace ApiMegaplex\Controllers;
 
-class ViewHtml
+class ViewHtmlController
 {
 
     static function home()

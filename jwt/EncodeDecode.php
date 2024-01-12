@@ -12,7 +12,9 @@ class EncodeDecode
     static function encode($data)
     {
         $key = $_ENV['KEY_SECRET']; // Asegúrate de usar una clave segura y única
-        $time = time() + (60 * 60); // 1 hora de expiración
+        // 1 mes de duración
+        $time = time() + (60 * 60 * 24 * 30); // 1 mes de duración
+        // $time = time() + (60 * 60); // 1 hora de duración 
 
         $correo = $data->correo;
         $rol = $data->rol;

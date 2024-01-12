@@ -4,7 +4,7 @@ namespace ApiMegaplex\Controllers;
 
 use ApiMegaplex\Mailer\SenderEmail;
 use Exception;
-class Email
+class EmailController
 {
 
     static function test()

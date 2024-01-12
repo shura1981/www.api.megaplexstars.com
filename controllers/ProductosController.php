@@ -36,9 +36,8 @@ class ProductosController
             if (!validarCampo($data, 'password', 'el campo password es obligatorio')) {
                 return; // Detiene la ejecución si hay un error de validación
             }
-            $decodedToken = $app->container->jwt->decodedToken;
-            $userDecode = $decodedToken->user;
-            $correo = $userDecode->correo;
+
+            $correo = $data->correo;
             $user = User::obtenerUsuario($correo);
 
             if ($user == null) {
@@ -55,8 +54,10 @@ class ProductosController
                 return;
             }
 
+
+            $jwt = EncodeDecode::encode($user);
             $app->response()->status(200);
-            $response = array('message' => 'Bienvenido ' . $correo);
+            $response = array('token' => $jwt, 'message' => 'Inicio de sesión exitoso');
             echo json_encode($response);
         } catch (Exception $e) {
             // Manejar otras excepciones (token inválido, error en la decodificación, etc.)

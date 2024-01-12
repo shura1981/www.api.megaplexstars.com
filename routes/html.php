@@ -1,8 +1,8 @@
 <?php
-use ApiMegaplex\Controllers\ViewHtml;
-use ApiMegaplex\Controllers\Email;
+use ApiMegaplex\Controllers\ViewHtmlController;
+use ApiMegaplex\Controllers\EmailController;
 
-$app->get('/', ViewHtml::class . ':home');
-$app->get('/login', ViewHtml::class . ':login');
-$app->get('/registre', ViewHtml::class . ':registre');
-$app->get('/correo', Email::class . ':test');
+$app->get('/', ViewHtmlController::class . ':home');
+$app->get('/login', ViewHtmlController::class . ':login');
+$app->get('/registre', ViewHtmlController::class . ':registre');
+$app->get('/correo', EmailController::class . ':test');
