@@ -7,6 +7,33 @@ Este proyecto es un framework personalizado diseñado específicamente para desa
 - **Framework de Rutas Slim**: Usa Slim 2.6, un micro framework de PHP, para manejar las rutas de manera eficiente y sencilla.
 - **Personalizado para Elitenut**: Diseñado con las necesidades específicas de Elitenut en mente, asegurando un ajuste perfecto para los proyectos de la empresa.
 
+
+## Fichero .env
+
+Se debe crear un fichero .env para las conexiones con la base de datos y credenciales para enviar correos
+
+DB_HOST=localhost
+DB_USER=
+DB_PASS=
+DB_NAME=
+
+KEY_SECRET= llave secreta para generar los jwt
+KEY_HEADER= Authentication basic para los endpoint
+
+FILE_JSON=public/json/productos.json
+FILE_USERS_JSON=public/json/users.json
+PATH_UPLOAD_IMAGES=public/uploads/images/
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.googlemail.com
+MAIL_PORT=465
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_ENCRYPTION=ssl
+MAIL_FROM_ADDRESS=
+MAIL_FROM_NAME="NAME APP"
+
+
 ## Comandos Disponibles
 
 Este framework incluye una serie de comandos útiles para facilitar el desarrollo y mantenimiento de tus aplicaciones:
