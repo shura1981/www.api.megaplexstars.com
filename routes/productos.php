@@ -5,6 +5,7 @@ use ApiMegaplex\Models\UserEliteNut;
 
 $app->response()->header('Content-Type', 'application/json;charset=UTF-8'); //Para que devuelva un json por defecto
 $app->post('/api/login', 'tokenHeader', ProductosController::class . ':login');
+$app->post('/api/cambiar-estado', 'tokenHeader', ProductosController::class . ':cambiarEstado');
 $app->post('/api/registre', 'tokenHeader', ProductosController::class . ':registre');
 $app->get('/api/prueba', 'tokenJwt', ProductosController::class . ':prueba');
 $app->get('/api/productos', 'tokenJwt', ProductosController::class . ':getProductos');

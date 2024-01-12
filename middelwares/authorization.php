@@ -2,8 +2,9 @@
 
 use ApiMegaplex\Exceptions\JwtException;
 use ApiMegaplex\Jwt\EncodeDecode;
+use ApiMegaplex\Models\User;
 
-use stdClass;
+// use stdClass;
 
 
 
@@ -25,7 +26,8 @@ function tokenJwt()
     // obtener jwt de la cabecera de autorización
     $header = (array_key_exists('Authorization', getallheaders())) ? getallheaders()['Authorization'] : null;
     if ($header == null) {
-        $result = array('error' => "No se ha enviado el token");
+        $app->response()->status(401);
+        $result = array('error' => "No se ha enviado el token", 'message' => "No autorizado");
         echo json_encode($result);
         $app->stop();
     }
@@ -34,6 +36,24 @@ function tokenJwt()
     $jwt = $header;
     try {
         $decoded = EncodeDecode::decode($jwt);
+        $correo = $decoded->user->correo;
+
+        $user = User::obtenerUsuario($correo);
+
+        if ($user == null) {
+            $app->response()->status(401);
+            $response = array('error' => 'Error en la validación de credenciales', 'message' => 'Usuario no registrado');
+            echo json_encode($response);
+            $app->stop();
+        }
+
+        if ($user->active == 0) {
+            $app->response()->status(401);
+            $response = array('error' => 'Error en la validación de credenciales', 'message' => 'Usuario desactivado');
+            echo json_encode($response);
+            $app->stop();
+        }
+
         // Si el token es válido y no ha expirado, podrás acceder a los datos del payload
         // añadir resultado al request
         $app->container->set('jwt', new stdClass());

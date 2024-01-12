@@ -73,7 +73,7 @@ class UserEliteNut
 
 
 
-$users= User::getAllUsers();
+$users= UserEliteNut::getAllUsers();
 // echo json_encode($users);
 echo $users[0]->cargo;
 

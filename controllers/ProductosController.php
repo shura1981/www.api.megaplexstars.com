@@ -37,15 +37,30 @@ class ProductosController
                 return; // Detiene la ejecución si hay un error de validación
             }
 
+
+
             $correo = $data->correo;
+
             $user = User::obtenerUsuario($correo);
+
+
+
 
             if ($user == null) {
                 $app->response()->status(401);
-                $response = array('message' => 'Usuario no existe');
+                $response = array('message' => 'Usuario no existe', "error" => "No autorizado");
                 echo json_encode($response);
                 return;
             }
+
+            if ($user->active == 0) {
+                $app->response()->status(401);
+                $response = array('message' => 'Usuario inactivo', "error" => "No autorizado");
+                echo json_encode($response);
+                return;
+            }
+
+
 
             if ($user->contrasena != $data->password) {
                 $app->response()->status(401);
@@ -64,6 +79,45 @@ class ProductosController
             echo handle_error($app, $e);
         }
     }
+
+
+    static function cambiarEstado()
+    {
+        $app = \Slim\Slim::getInstance();
+        try {
+            $data = json_decode($app->request()->getBody());
+
+            if (!validarCampo($data, 'correo', 'el campo correo es obligatorio')) {
+                return; // Detiene la ejecución si hay un error de validación
+            }
+            if (!validar($data, 'estado', 'el campo estado es obligatorio')) {
+                return; // Detiene la ejecución si hay un error de validación
+            }
+
+            $correo = $data->correo;
+            $estado = $data->estado;
+
+            // validar si $estado es un entero, si no lo es poner 0 por defecto
+            if (!is_int($estado)) {
+                $app->response()->status(401);
+                $response = array('message' => 'El estado debe ser un entero 0 para desactivar o 1 para activar');
+                echo json_encode($response);
+                return;
+            }
+
+            $mensaje = User::cambiarEstadoUsuario($correo, $estado);
+
+            $app->response()->status(200);
+            $response = array('message' => $mensaje);
+            echo json_encode($response);
+
+        } catch (Exception $e) {
+            // Manejar otras excepciones (token inválido, error en la decodificación, etc.)
+            echo handle_error($app, $e);
+        }
+    }
+
+
     static function registre()
     {
         $app = \Slim\Slim::getInstance();

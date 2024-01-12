@@ -13,18 +13,21 @@ class User implements JsonSerializable
     {
         return [
             'correo' => $this->correo,
-            'rol' => $this->rol,
+            'rol' => $this->rol
         ];
     }
     public $correo;
     public $contrasena;
     public $rol;
 
-    public function __construct($correo, $contrasena, $rol)
+    public $active;
+
+    public function __construct($correo, $contrasena, $rol, $active = 1)
     {
         $this->correo = $correo;
         $this->contrasena = $contrasena;
         $this->rol = $rol;
+        $this->active = $active;
     }
 
 
@@ -67,7 +70,7 @@ class User implements JsonSerializable
      * 
      * @return User usuario con el correo y contraseña
      */
-    static function obtenerUsuario($correo): User
+    static function obtenerUsuario($correo): ?User
     {
         try {
             $file = $_ENV['FILE_USERS_JSON']; // Ruta del fichero JSON
@@ -86,6 +89,33 @@ class User implements JsonSerializable
         }
     }
 
+
+
+    static function cambiarEstadoUsuario($correo, $estado = 0): string
+    {
+        try {
+            $file = $_ENV['FILE_USERS_JSON']; // Ruta del fichero JSON
+            $user = self::obtenerUsuario($correo);
+
+            if ($user == null) {
+                throw new Exception("El usuario no existe", 400);
+            }
+
+            $user->active =  $estado;
+
+            // si se encontró el usuario, actualizar el fichero
+            $isUpdate = IoUserJson::updateJson($file, $user);
+
+            if (!$isUpdate) {
+                throw new Exception("No se pudo actualizar el usuario", 500);
+            }
+
+            return $estado == 1 ? "Usuario activado" : "Usuario desactivado";
+
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), 500);
+        }
+    }
 
 
 
