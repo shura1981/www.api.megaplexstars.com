@@ -117,7 +117,28 @@ class ProductosController
         }
     }
 
+    static function removeCount()
+    {
+        $app = \Slim\Slim::getInstance();
+        try {
+            $data = json_decode($app->request()->getBody());
 
+            if (!validarCampo($data, 'email', 'el campo email es obligatorio')) {
+                return; // Detiene la ejecución si hay un error de validación
+            }
+
+            $correo = $data->email;
+            User::removeCount($correo);
+            $mensaje = "Usuario eliminado";
+            $app->response()->status(200);
+            $response = array('message' => $mensaje);
+            echo json_encode($response);
+
+        } catch (Exception $e) {
+            // Manejar otras excepciones (token inválido, error en la decodificación, etc.)
+            echo handle_error($app, $e);
+        }
+    }
     static function registre()
     {
         $app = \Slim\Slim::getInstance();

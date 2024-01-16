@@ -116,5 +116,16 @@ class IoUserJson
     }
 
 
+    static function updatelistJson($file, array $users): bool
+    {
+        try {
+            // actualizar el array en el fichero
+            file_put_contents($file, json_encode($users, JSON_NUMERIC_CHECK));
+            return true;
+        } catch (Exception $e) {
+            throw new IoException($e->getMessage(), 500);
+        }
+    }
+
 
 }

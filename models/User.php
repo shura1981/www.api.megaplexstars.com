@@ -89,7 +89,29 @@ class User implements JsonSerializable
         }
     }
 
-
+    static function removeCount($correo): bool
+    {
+        try {
+            $file = $_ENV['FILE_USERS_JSON']; // Ruta del fichero JSON
+            $users = IoUserJson::readJson($file);
+            $eliminado = false;
+            // buscar el usuario con el correo en el array
+            foreach ($users as $key => $value) {
+                if ($value->correo == $correo) {
+                    unset($users[$key]);
+                    $eliminado = true;
+                    break;
+                }
+            }
+            if ($eliminado == false) {
+                throw new Exception("El usuario no existe", 400);
+            }
+            // eliminar el usuario del array
+            return IoUserJson::updatelistJson($file, $users);
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage(), 500);
+        }
+    }
 
     static function cambiarEstadoUsuario($correo, $estado = 0): string
     {
@@ -101,7 +123,7 @@ class User implements JsonSerializable
                 throw new Exception("El usuario no existe", 400);
             }
 
-            $user->active =  $estado;
+            $user->active = $estado;
 
             // si se encontró el usuario, actualizar el fichero
             $isUpdate = IoUserJson::updateJson($file, $user);

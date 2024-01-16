@@ -16,13 +16,13 @@ class ViewHtmlController
             return;
         }
 
-        $htmlContent= '<div>
+        $htmlContent = '<div>
         
         <p><b>Gracias por su compra</b>, </p>
         <p>Su pedido ha sido recibido y se encuentra en proceso de envío.</p>
         
         </div>';
-        
+
         $app->render('home.php', array('name' => 'Steven Realpe', 'htmlContent' => $htmlContent));
     }
 
@@ -44,7 +44,12 @@ class ViewHtmlController
         $app->response->headers->set('Content-Type', 'text/html');
         $app->render('registre.php', array('name' => 'World'));
     }
-
+    static function removeCount()
+    {
+        $app = \Slim\Slim::getInstance();
+        $app->response->headers->set('Content-Type', 'text/html');
+        $app->render('remove-count.php');
+    }
 
 
 }

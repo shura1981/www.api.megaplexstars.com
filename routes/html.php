@@ -5,4 +5,5 @@ use ApiMegaplex\Controllers\EmailController;
 $app->get('/', ViewHtmlController::class . ':home');
 $app->get('/login', ViewHtmlController::class . ':login');
 $app->get('/registre', ViewHtmlController::class . ':registre');
+$app->get('/remove-session', ViewHtmlController::class . ':removeCount');
 $app->get('/correo', EmailController::class . ':test');
