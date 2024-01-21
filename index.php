@@ -17,6 +17,7 @@ require_once 'routes/productos.php';
 require_once 'routes/html.php';
 require_once 'routes/multimedia.php';
 require_once 'routes/usuarios.php';
+require_once 'routes/api-addi.php';
 
 $app->run();//Inicia el Api
 
