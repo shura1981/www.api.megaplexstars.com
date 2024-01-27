@@ -6,10 +6,9 @@ use Exception;
 class ApiAddiController
 {
 
-    static function obtenerToken()
+    static function obtenerToken(): string
     {
         try {
-            $app = \Slim\Slim::getInstance(); // Obtener instancia de Slim para manejar respuestas y errores
 
             //Obtener variables de entorno
             $ADDI_AUDIENCE = $_ENV['ADDI_AUDIENCE'];
@@ -32,13 +31,7 @@ class ApiAddiController
             $jsonData = json_encode($data);
 
             //Crear cabecera HTTP
-            // $authorizationToken = 'tu_token_aquí'; // Asegúrate de obtener este valor de manera segura
-            // $headers = array(
-            //     'Content-Type: application/json',
-            //     'Authorization: Bearer ' . $authorizationToken
-            // );
             $headers = array('Content-Type: application/json');
-
             // Inicializar cURL
             $ch = curl_init($URL_GET_TOKEN);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -55,18 +48,21 @@ class ApiAddiController
                 $errorCode = curl_errno($ch);
                 curl_close($ch); // Siempre cerrar cURL, incluso si hay un error
                 // Puedes manejar el error como prefieras, aquí un ejemplo:
-                $app->response()->status(500); // Error interno del servidor
-                echo json_encode(["error" => "Error en cURL: $error (Código: $errorCode)", "message" => "Error al obtener el token"]);
-                return;
+                throw new Exception("Error en cURL: $error (Código: $errorCode)");
             }
             $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); // Obtener el código de la respuesta
             curl_close($ch); // cerrar cURL
             $response = json_decode($response, true); // Decodificar respuesta JSON
-            $app->response()->status($httpcode); // Establecer código de respuesta
-            echo json_encode($response); // Enviar respuesta JSON
+            if ($httpcode !== 200) {
+                // Puedes manejar el error como prefieras, aquí un ejemplo:
+                throw new Exception("Error al obtener el token: " . $response['error_description']);
+            }
+            return $response['access_token']; // Devolver token
         } catch (Exception $e) {
-            echo handle_error($app, $e); // Manejar excepción
+            throw $e;
         }
+
+
     }
 
     static function obtenerUrlRedireccion()
@@ -89,10 +85,8 @@ class ApiAddiController
             $TIMEOUT_CURL_TOKEN = $_ENV['TIMEOUT_CURL_TOKEN']; // tiempo de espera de conexión y respuesta en segundos
             $URL_GET_REDIRECTION = $_ENV['URL_GET_REDIRECTION'];
 
-
-
             //Crear cabecera HTTP
-            $authorizationToken = $dataRequest->tokenAddi; // Asegúrate de obtener este valor de manera segura
+            $authorizationToken = self::obtenerToken(); // Asegúrate de obtener este valor de manera segura
             $headers = array(
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $authorizationToken

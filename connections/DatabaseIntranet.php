@@ -9,7 +9,7 @@ class DatabaseIntranet
     private $password = "].wKbv44W4LW8b";
     private $conn;
 
-    public function openConnection()
+    public function openConnection():mysqli
     {
         $this->conn = new mysqli($this->host, $this->username, $this->password, $this->db_name);
         $this->conn->set_charset("utf8mb4");
