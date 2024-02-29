@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set('America/Bogota');
 function consumePutApi($url, $data, $enabledSSL = false)
 {
     $ch = curl_init();
@@ -115,33 +116,114 @@ function getList()
 
 }
 
+// function alternarPuerto()
+// {
+//     static $ultimoPuerto = null;
+//     $port1 = 8086;
+//     $port2 = 8085;
+
+//     // Alternar entre $port1 y $port2
+//     if ($ultimoPuerto === $port1) {
+//         $ultimoPuerto = $port2;
+//     } else {
+//         $ultimoPuerto = $port1;
+//     }
+
+//     return $ultimoPuerto;
+// }
+
+// function checkProcess()
+// {
+
+//     $timePause = 10;
+
+//     $list = getList();
+//     if (count($list) == 0) {
+//         echo "No hay registros para procesar";
+//         return;
+//     }
+
+//     foreach ($list as $item) {
+//         $id = $item['id'];
+//         $message = $item['message'];
+//         $cell = $item['cell'];
+//         $port = alternarPuerto();
+//         sendWhatsapp($cell, $message, $port);
+//         notification($message);
+//         update($id);
+//         sleep($timePause); // pausar el proceso por 5 segundos
+//     }
+
+//     echo "Tarea ejecutada";
+// }
+
+
+function alternarPuerto() {
+    $stateFile = "../public/files/lastport.file"; // Ruta al archivo de estado del puerto
+
+    // Leer el último puerto almacenado desde el archivo
+    $ultimoPuerto = file_exists($stateFile) ? file_get_contents($stateFile) : null;
+    $port1 = 8086;
+    $port2 = 8085;
+
+    // Alternar entre $port1 y $port2
+    if ($ultimoPuerto === (string) $port1) {
+        $ultimoPuerto = $port2;
+    } else {
+        $ultimoPuerto = $port1;
+    }
+
+    // Guardar el último puerto utilizado en el archivo
+    file_put_contents($stateFile, (string) $ultimoPuerto);
+
+    return $ultimoPuerto;
+}
+
+
 function checkProcess()
 {
+    $stateFile = "../public/files/state.file"; // Ruta al archivo de estado
 
-    $timePause = 10;
+    // Verificar si el proceso está OCUPADO
+    if (file_get_contents($stateFile) === "OCUPADO") {
+        return; // Salir si ya está ocupado
+    }
 
+    // Establecer el estado a OCUPADO
+    file_put_contents($stateFile, "OCUPADO");
 
+    $timePause = 20;
     $list = getList();
+
     if (count($list) == 0) {
         echo "No hay registros para procesar";
+        file_put_contents($stateFile, "LIBRE"); // Establecer el estado a LIBRE
         return;
     }
-    $i = 0; // Inicializar el contador
+
     foreach ($list as $item) {
         $id = $item['id'];
         $message = $item['message'];
         $cell = $item['cell'];
-        $port = $i % 2 == 0 ? 8086 : 8085;
+        $port = alternarPuerto();
         sendWhatsapp($cell, $message, $port);
         notification($message);
         update($id);
-        sleep($timePause); // pausar el proceso por 5 segundos
-        $i++;
+        sleep($timePause); // pausar el proceso por $timePause segundos
     }
 
     echo "Tarea ejecutada";
+    file_put_contents($stateFile, "LIBRE"); // Establecer el estado a LIBRE al final
 }
 
-
-
+// Ejemplo de uso
 checkProcess();
+
+
+
+
+
+
+
+
+ 

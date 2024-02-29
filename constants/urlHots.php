@@ -1,2 +1,3 @@
-<?php 
-define('URL_HOST',$_SERVER['REQUEST_SCHEME'] . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']); //URL HOST
+<?php
+$urlServer = $_ENV['URL_SERVER'];
+define('URL_HOST', $urlServer); //URL HOST

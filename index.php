@@ -7,6 +7,7 @@ require_once 'partials/headers.php';
 require_once 'validaciones/handle-error.php';
 require_once 'validaciones/validator.php';
 require_once 'constants/urlHots.php';
+require_once 'connections/DatabaseIntranet.php';
 // require_once '../connection_mysql/connection_intranet.php';
 
 $app = new \Slim\Slim();
@@ -14,11 +15,11 @@ $app = new \Slim\Slim();
 
 
 require_once 'routes/productos.php';
-require_once 'routes/html.php';
 require_once 'routes/multimedia.php';
 require_once 'routes/usuarios.php';
 require_once 'routes/api-addi.php';
 require_once 'routes/cron-jobs.php';
+require_once 'routes/html.php';
 
 $app->run();//Inicia el Api
 

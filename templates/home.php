@@ -13,10 +13,11 @@
    <h1>Hello,
       <?= htmlspecialchars($name) ?>!
    </h1>
-   <div>
-    <?= $htmlContent ?>
-</div>
 
+   <div>
+      <?= $htmlContent ?>
+   </div>
+   <a href="<?= htmlspecialchars($url)?>logout">Cerrar Sesión</a>
 </body>
 
 </html>
