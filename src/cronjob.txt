@@ -1,0 +1,1 @@
+php /home3/crisenri/api.megaplexstars.com/cron-jobs/message-whatsapp.php > /dev/null

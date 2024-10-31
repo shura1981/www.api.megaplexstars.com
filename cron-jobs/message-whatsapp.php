@@ -30,11 +30,22 @@ function notification($message)
     $url = "https://elitenutritiongroup-9385a.firebaseio.com/cronJob.json";
     consumePutApi($url, $package);
 }
-function sendWhatsapp($number, $message, $port)
+function sendWhatsapp($number, $message, $port, $isMultiMedia = false)
 {
-    $url = "https://elitenutapp.com/whatsapp/message?to=57$number&message=$message&port=$port";
+
+    if ($isMultiMedia) {
+        $url =  str_replace(
+            ['{port}'],
+            [$port],
+            $message
+        );
+    } else {
+        $url = "https://elitenutapp.com/whatsapp/message?to=57$number&message=$message&port=$port";
+    }
+
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -64,13 +75,12 @@ function closeConnection($conn)
 {
     if ($conn != null)
         $conn->close();
-
 }
 function update($id)
 {
     //obtener la fecha actual y hora yyyy-mm-dd HH:mm
     $timeSpan = date('Y-m-d H:i:s');
-    $query = "UPDATE tb_cronJobWhatsapp SET  time_update='$timeSpan' WHERE id= $id";
+    $query = "UPDATE tb_cronjobwhatsapp SET  time_update='$timeSpan' WHERE id= $id";
     try {
         $conn = getConnection();
         return $conn->query($query);
@@ -79,14 +89,13 @@ function update($id)
     } finally {
         closeConnection($conn);
     }
-
 }
 
 function delete($id)
 {
 
     try {
-        $query = "DELETE FROM tb_cronJobWhatsapp WHERE id= $id";
+        $query = "DELETE FROM tb_cronjobwhatsapp WHERE id= $id";
         $conn = getConnection();
         return $conn->query($query);
     } catch (Exception $e) {
@@ -94,17 +103,31 @@ function delete($id)
     } finally {
         closeConnection($conn);
     }
-
 }
 
+
+/**
+ * Obtener los registros de la tabla tb_cronjobwhatsapp
+ * @return array{
+ * id: int,
+ * message: string,
+ * time_create: string,
+ * time_update: string,
+ * cell: string,
+ * multimedia: boolean
+ * }[]
+ * @throws Exception
+ */
 function getList()
 {
     try {
-        $query = "SELECT id,message, time_create, time_update, cell FROM tb_cronJobWhatsapp WHERE time_update IS  NULL;";
+        $query = "SELECT id,message, time_create, time_update, cell, multimedia FROM tb_cronjobwhatsapp WHERE time_update IS  NULL LIMIT 50;";
         $conn = getConnection();
         $rows = [];
         $result = $conn->query($query);
         while ($row = $result->fetch_assoc()) {
+            // casting de multimedia a boolean
+            $row['multimedia'] = (bool) $row['multimedia'];
             $rows[] = $row;
         }
         return $rows;
@@ -113,52 +136,10 @@ function getList()
     } finally {
         closeConnection($conn);
     }
-
 }
 
-// function alternarPuerto()
-// {
-//     static $ultimoPuerto = null;
-//     $port1 = 8086;
-//     $port2 = 8085;
-
-//     // Alternar entre $port1 y $port2
-//     if ($ultimoPuerto === $port1) {
-//         $ultimoPuerto = $port2;
-//     } else {
-//         $ultimoPuerto = $port1;
-//     }
-
-//     return $ultimoPuerto;
-// }
-
-// function checkProcess()
-// {
-
-//     $timePause = 10;
-
-//     $list = getList();
-//     if (count($list) == 0) {
-//         echo "No hay registros para procesar";
-//         return;
-//     }
-
-//     foreach ($list as $item) {
-//         $id = $item['id'];
-//         $message = $item['message'];
-//         $cell = $item['cell'];
-//         $port = alternarPuerto();
-//         sendWhatsapp($cell, $message, $port);
-//         notification($message);
-//         update($id);
-//         sleep($timePause); // pausar el proceso por 5 segundos
-//     }
-
-//     echo "Tarea ejecutada";
-// }
-
-
-function alternarPuerto() {
+function alternarPuerto()
+{
     $stateFile = "../public/files/lastport.file"; // Ruta al archivo de estado del puerto
 
     // Leer el último puerto almacenado desde el archivo
@@ -205,8 +186,9 @@ function checkProcess()
         $id = $item['id'];
         $message = $item['message'];
         $cell = $item['cell'];
+        $isMultiMedia = $item['multimedia'];
         $port = alternarPuerto();
-        sendWhatsapp($cell, $message, $port);
+        sendWhatsapp($cell, $message, $port, $isMultiMedia);
         notification($message);
         update($id);
         sleep($timePause); // pausar el proceso por $timePause segundos
@@ -216,14 +198,6 @@ function checkProcess()
     file_put_contents($stateFile, "LIBRE"); // Establecer el estado a LIBRE al final
 }
 
-// Ejemplo de uso
 checkProcess();
-
-
-
-
-
-
-
 
  
