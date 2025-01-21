@@ -1,7 +1,7 @@
 <?php
 namespace ApiMegaplex\Controllers;
 
-use ApiMegaplex\Connections\DatabaseIntranet;
+require_once 'connections/DatabaseIntranet.php';
 use Exception;
 
 
@@ -11,7 +11,7 @@ class cronJobWhatsapp
 
     static function update($message, $cell): int
     {
-        $db = new DatabaseIntranet();
+        $db = $conn;
         try {
             $conn = $db->openConnection();
 
@@ -33,7 +33,7 @@ class cronJobWhatsapp
     }
     static function insert($message, $cell): bool
     {
-        $db = new DatabaseIntranet();
+        $db = $conn;
         try {
             $conn = $db->openConnection();
             $stmt = $conn->prepare("INSERT INTO tb_cronJobWhatsapp SET message=?, cell=?");
@@ -66,7 +66,6 @@ class cronJobWhatsapp
 
             $message = $data->message;
             $cell = $data->cell;
-
 
             $isInsert = self::insert($message, $cell);
             $app->response()->status(201);

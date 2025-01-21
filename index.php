@@ -13,11 +13,12 @@ require_once 'connections/DatabaseIntranet.php';
 $app = new \Slim\Slim();
 
 
+require_once 'routes/api-addi.php';
+require_once 'routes/api-sistecredito.php';
 
 require_once 'routes/productos.php';
 require_once 'routes/multimedia.php';
 require_once 'routes/usuarios.php';
-require_once 'routes/api-addi.php';
 require_once 'routes/cron-jobs.php';
 require_once 'routes/html.php';
 

@@ -3,7 +3,8 @@
 namespace ApiMegaplex\Models;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-use ApiMegaplex\Connections\DatabaseIntranet;
+require_once 'connections/DatabaseIntranet.php';
+
 use Exception;
 
 class UserEliteNut
@@ -12,7 +13,8 @@ class UserEliteNut
     public $id_usuario;
     public $cargo;
 
-    public function __construct($usuario, $id_usuario, $cargo) {
+    public function __construct($usuario, $id_usuario, $cargo)
+    {
         $this->usuario = $usuario;
         $this->id_usuario = $id_usuario;
         $this->cargo = $cargo;
@@ -21,7 +23,7 @@ class UserEliteNut
     static function getUser()
     {
 
-        $db = new DatabaseIntranet();
+        $db =  $conn;
 
         $id_usuario = 116;
         try {
@@ -37,20 +39,18 @@ class UserEliteNut
         } finally {
             $db->closeConnection();
         }
-
-
-
     }
 
-    static function getAllUsers() {
-        $db = new DatabaseIntranet();
-    
+    static function getAllUsers()
+    {
+        $db = $conn;
+
         try {
             $conn = $db->openConnection();
             $stmt = $conn->prepare("SELECT usuario, id_usuario, cargo FROM tb_empleados");
             $stmt->execute();
             $result = $stmt->get_result();
-    
+
             $users = [];
             while ($row = $result->fetch_assoc()) {
                 // $users[] = $row;
@@ -66,14 +66,10 @@ class UserEliteNut
             $db->closeConnection();
         }
     }
-    
-
-
 }
 
 
 
-$users= UserEliteNut::getAllUsers();
+$users = UserEliteNut::getAllUsers();
 // echo json_encode($users);
 echo $users[0]->cargo;
-

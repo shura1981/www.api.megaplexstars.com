@@ -9,7 +9,7 @@ use JsonSerializable; // Add this import statement
 
 class User implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize():array
     {
         return [
             'correo' => $this->correo,

@@ -10,7 +10,7 @@ use JsonSerializable; // Add this import statement
 
 class UserTest implements JsonSerializable
 {
-    public function jsonSerialize()
+    public function jsonSerialize():array
     {
         return [
             'id' => $this->id,
