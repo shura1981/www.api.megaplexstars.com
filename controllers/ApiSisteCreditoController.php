@@ -128,6 +128,9 @@ class ApiSisteCreditoController
       $data['document']
     );
 
+    // guardar el cuerpo de la solicitud
+    file_put_contents('log/request_body.json', $requestBody);
+    
     // Configuración de la solicitud cURL
     $curl = curl_init();
 
@@ -137,21 +140,86 @@ class ApiSisteCreditoController
       CURLOPT_ENCODING => '',
       CURLOPT_MAXREDIRS => 10,
       CURLOPT_TIMEOUT => $TIMEOUT_CURL_TOKEN, // tiempo de espera de conexión y respuesta en segundos
+      CURLOPT_CONNECTTIMEOUT => 30, // timeout de conexión específico
       CURLOPT_FOLLOWLOCATION => true,
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
       CURLOPT_CUSTOMREQUEST => 'POST',
       CURLOPT_POSTFIELDS => $requestBody,
       CURLOPT_HTTPHEADER => self::obtenerHeaders(),
+      CURLOPT_SSL_VERIFYPEER => true,
+      CURLOPT_SSL_VERIFYHOST => 2,
+      CURLOPT_USERAGENT => 'MegaplexStars-API/1.0',
+      CURLOPT_VERBOSE => false, // cambiar a true para debug detallado
     ]);
 
     $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($curl);
+    $curlInfo = curl_getinfo($curl);
     curl_close($curl);
 
-    $response = json_decode($response, true);
-    $idTransaccion = self::obtenerId($response['data']);
+    // Log detallado para debugging
+    $debugInfo = [
+      'timestamp' => date('Y-m-d H:i:s'),
+      'url' => $URL_POST_CREATE_ORDER,
+      'http_code' => $httpCode,
+      'curl_error' => $curlError,
+      'curl_info' => $curlInfo,
+      'raw_response' => $response,
+      'request_headers' => self::obtenerHeaders(),
+      'request_body_length' => strlen($requestBody)
+    ];
+    
+    file_put_contents('log/curl_debug.json', json_encode($debugInfo, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
+    // Verificar errores de cURL
+    if ($response === false) {
+      $errorMsg = "Error de cURL: " . $curlError;
+      file_put_contents('log/curl_error.log', date('Y-m-d H:i:s') . " - " . $errorMsg . "\n", FILE_APPEND);
+      throw new Exception($errorMsg);
+    }
+
+    // Verificar código HTTP
+    if ($httpCode < 200 || $httpCode >= 300) {
+      $errorMsg = "Error HTTP {$httpCode}. Respuesta: " . substr($response, 0, 500);
+      file_put_contents('log/http_error.log', date('Y-m-d H:i:s') . " - " . $errorMsg . "\n", FILE_APPEND);
+      throw new Exception($errorMsg);
+    }
+
+    // Verificar si la respuesta está vacía
+    if (empty($response)) {
+      $errorMsg = "Respuesta vacía del servidor. HTTP Code: {$httpCode}";
+      file_put_contents('log/empty_response.log', date('Y-m-d H:i:s') . " - " . $errorMsg . "\n", FILE_APPEND);
+      throw new Exception($errorMsg);
+    }
+
+    // Decodificar JSON
+    $decodedResponse = json_decode($response, true);
+    
+    // Verificar errores en el JSON
+    if (json_last_error() !== JSON_ERROR_NONE) {
+      $errorMsg = "Error al decodificar JSON: " . json_last_error_msg() . ". Respuesta raw: " . substr($response, 0, 500);
+      file_put_contents('log/json_error.log', date('Y-m-d H:i:s') . " - " . $errorMsg . "\n", FILE_APPEND);
+      throw new Exception($errorMsg);
+    }
+
+    // Guardar respuesta decodificada
+    file_put_contents('log/response_body.json', json_encode($decodedResponse, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+    // Verificar estructura de la respuesta
+    if (!isset($decodedResponse['data'])) {
+      $errorMsg = "Estructura de respuesta inválida. Respuesta completa: " . json_encode($decodedResponse);
+      file_put_contents('log/structure_error.log', date('Y-m-d H:i:s') . " - " . $errorMsg . "\n", FILE_APPEND);
+      IoResponse::responseSave($decodedResponse);
+      throw new Exception("La respuesta no contiene el campo 'data' esperado");
+    }
+
+    $idTransaccion = self::obtenerId($decodedResponse['data']);
+    
     if ($idTransaccion == null) {
-      IoResponse::responseSave($response);
+      $errorMsg = "No se pudo obtener el ID de transacción. Data: " . json_encode($decodedResponse['data']);
+      file_put_contents('log/id_error.log', date('Y-m-d H:i:s') . " - " . $errorMsg . "\n", FILE_APPEND);
+      IoResponse::responseSave($decodedResponse);
       throw new Exception("Error al obtener el id de la transacción");
     }
 
