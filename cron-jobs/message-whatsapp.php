@@ -30,18 +30,25 @@ function notification($message)
     $url = "https://elitenutritiongroup-9385a.firebaseio.com/cronJob.json";
     consumePutApi($url, $package);
 }
+function getUrlMultimedia($port, $message): string
+{
+    $url =  str_replace(
+        ['{port}'],
+        [$port],
+        $message
+    );
+    return $url;
+}
+function getUrl($number, $message, $port): string
+{
+    $url = "https://elitenutapp.com/whatsapp/message?to=57$number&message=$message&port=$port";
+    return $url;
+}
 function sendWhatsapp($number, $message, $port, $isMultiMedia = false)
 {
 
-    if ($isMultiMedia) {
-        $url =  str_replace(
-            ['{port}'],
-            [$port],
-            $message
-        );
-    } else {
-        $url = "https://elitenutapp.com/whatsapp/message?to=57$number&message=$message&port=$port";
-    }
+    // obtener la url dependiendo si es multimedia o no
+    $url = $isMultiMedia  ? getUrlMultimedia($port, $message) : getUrl($number,$message, $port);
 
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
@@ -200,5 +207,3 @@ function checkProcess()
 }
 
 checkProcess();
-
- 
