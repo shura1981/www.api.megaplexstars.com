@@ -140,24 +140,25 @@ function getList()
 
 function alternarPuerto()
 {
-    $stateFile = "../public/files/lastport.file"; // Ruta al archivo de estado del puerto
+    // $stateFile = "../public/files/lastport.file"; // Ruta al archivo de estado del puerto
 
-    // Leer el último puerto almacenado desde el archivo
-    $ultimoPuerto = file_exists($stateFile) ? file_get_contents($stateFile) : null;
-    $port1 = 8086;
+    // // Leer el último puerto almacenado desde el archivo
+    // $ultimoPuerto = file_exists($stateFile) ? file_get_contents($stateFile) : null;
+    // $port1 = 8086;
     $port2 = 8085;
 
-    // Alternar entre $port1 y $port2
-    if ($ultimoPuerto === (string) $port1) {
-        $ultimoPuerto = $port2;
-    } else {
-        $ultimoPuerto = $port1;
-    }
+    // // Alternar entre $port1 y $port2
+    // if ($ultimoPuerto === (string) $port1) {
+    //     $ultimoPuerto = $port2;
+    // } else {
+    //     $ultimoPuerto = $port1;
+    // }
 
-    // Guardar el último puerto utilizado en el archivo
-    file_put_contents($stateFile, (string) $ultimoPuerto);
+    // // Guardar el último puerto utilizado en el archivo
+    // file_put_contents($stateFile, (string) $ultimoPuerto);
 
-    return $ultimoPuerto;
+    // return $ultimoPuerto;
+    return $port2;
 }
 
 
@@ -173,7 +174,7 @@ function checkProcess()
     // Establecer el estado a OCUPADO
     file_put_contents($stateFile, "OCUPADO");
 
-    $timePause = 20;
+    $timePause = 30;
     $list = getList();
 
     if (count($list) == 0) {
