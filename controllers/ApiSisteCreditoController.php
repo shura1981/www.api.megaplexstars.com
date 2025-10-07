@@ -113,6 +113,11 @@ class ApiSisteCreditoController
 
     $URL_RESPONSE = $data['mode'] == '1' ?  $URL_RESPONSE_SISTECREDITO : $URL_RESPONSE_SISTECREDITO_LINKPAGO;
 
+    // Validar si viene el $data el campo urlResponse sobreescribir la variable $URL_RESPONSE
+    if (!empty($data['urlResponse'])) {
+      $URL_RESPONSE = $data['urlResponse'];
+    }
+
     $requestBody = createPaymentRequestBody(
       $data['invoice'],
       $data['description'],
@@ -130,7 +135,7 @@ class ApiSisteCreditoController
 
     // guardar el cuerpo de la solicitud
     file_put_contents('log/request_body.json', $requestBody);
-    
+
     // Configuración de la solicitud cURL
     $curl = curl_init();
 
@@ -169,7 +174,7 @@ class ApiSisteCreditoController
       'request_headers' => self::obtenerHeaders(),
       'request_body_length' => strlen($requestBody)
     ];
-    
+
     file_put_contents('log/curl_debug.json', json_encode($debugInfo, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
     // Verificar errores de cURL
@@ -195,7 +200,7 @@ class ApiSisteCreditoController
 
     // Decodificar JSON
     $decodedResponse = json_decode($response, true);
-    
+
     // Verificar errores en el JSON
     if (json_last_error() !== JSON_ERROR_NONE) {
       $errorMsg = "Error al decodificar JSON: " . json_last_error_msg() . ". Respuesta raw: " . substr($response, 0, 500);
@@ -215,7 +220,7 @@ class ApiSisteCreditoController
     }
 
     $idTransaccion = self::obtenerId($decodedResponse['data']);
-    
+
     if ($idTransaccion == null) {
       $errorMsg = "No se pudo obtener el ID de transacción. Data: " . json_encode($decodedResponse['data']);
       file_put_contents('log/id_error.log', date('Y-m-d H:i:s') . " - " . $errorMsg . "\n", FILE_APPEND);

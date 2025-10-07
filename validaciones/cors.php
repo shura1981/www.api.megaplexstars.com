@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 // Lista de dominios permitidos
-$allowedDomains = ['http://localhost/www.api.megaplexstars.com', 'http://172.16.2.160:4004', 'https://nutramerican.com', 'http://localhost:4004', 'http://localhost', 'https://pagos.nutramerican.com'];
+$allowedDomains = ['https://nutramerican.com', 'http://localhost:4001',  'https://pagos.nutramerican.com', 'https://campeonato.megaplexstars.com'];
 
 // Obtiene el dominio de la solicitud entrante
 $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
