@@ -30,41 +30,86 @@ function notification($message)
     $url = "https://elitenutritiongroup-9385a.firebaseio.com/cronJob.json";
     consumePutApi($url, $package);
 }
-function getUrlMultimedia($port, $message): string
-{
-    $url =  str_replace(
-        ['{port}'],
-        [$port],
-        $message
-    );
-    return $url;
-}
-function getUrl($number, $message, $port): string
-{
-    $url = "https://elitenutapp.com/whatsapp/message?to=57$number&message=$message&port=$port";
-    return $url;
-}
-function sendWhatsapp($number, $message, $port, $isMultiMedia = false)
-{
 
-    // obtener la url dependiendo si es multimedia o no
-    $url = $isMultiMedia  ? getUrlMultimedia($port, $message) : getUrl($number,$message, $port);
+function createCampaignTemplateContextBody($fullName, $idOrder, $mount): array
+{
+    $fullName = (string) $fullName;
+    $idOrder = (string) $idOrder;
+    $mount = (string) $mount;
 
+    return [
+        "to" => "{{phoneNumberTemplateContext}}",
+        "templateName" => "confirmacion_pedido",
+        "languageCode" => "es_CO",
+        "components" => [
+            [
+                "type" => "header",
+                "parameters" => [
+                    [
+                        "type" => "image",
+                        "image" => [
+                            "link" => "https://nutramerican.com/img/logos/nutramerican-pharma.jpg"
+                        ]
+                    ]
+                ]
+            ],
+            [
+                "type" => "body",
+                "parameters" => [
+                    [
+                        "type" => "text",
+                        "text" => $fullName
+                    ],
+                    [
+                        "type" => "text",
+                        "text" => $idOrder
+                    ],
+                    [
+                        "type" => "text",
+                        "text" => $mount
+                    ]
+                ]
+            ]
+        ],
+        "agentId" => 1,
+        "idSession" => "{{phoneNumberTemplateContext}}",
+        "texto_cliente" => "",
+        "texto_agente" => "Hola *$fullName* te escribimos de nutramerican.com. Tu pedido con el numero de pago *N $idOrder* por valor de *$mount* ha sido *APROBADO* y sera entregado lo mas pronto posible.",
+        "active" => 1
+    ];
+}
+
+function sendWhatsappCampaignTemplateContext(array $payload)
+{
+    $url = "https://crm.elitenutapp.com/api/whatsapp/send/campaign-template-context";
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
-    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_TIMEOUT, 20);
-    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 20);
-    curl_setopt($curl, CURLOPT_HEADER, 0);
-    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json'
+    ]);
+
     $response = curl_exec($curl);
-    $data = json_decode($response);
+    if ($response === false) {
+        $error = curl_error($curl);
+        curl_close($curl);
+        throw new Exception("Error en envio de campana WhatsApp: " . $error);
+    }
+
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
-    return $data;
+
+    return [
+        "httpCode" => $httpCode,
+        "data" => json_decode($response, true),
+        "raw" => $response,
+    ];
 }
 
 function getConnection()
@@ -83,26 +128,11 @@ function closeConnection($conn)
     if ($conn != null)
         $conn->close();
 }
-function update($id)
+function updateV2($id)
 {
-    //obtener la fecha actual y hora yyyy-mm-dd HH:mm
     $timeSpan = date('Y-m-d H:i:s');
-    $query = "UPDATE tb_cronjobwhatsapp SET  time_update='$timeSpan' WHERE id= $id";
+    $query = "UPDATE tb_cronjobwhatsapp_v2 SET time_update='$timeSpan' WHERE id= $id";
     try {
-        $conn = getConnection();
-        return $conn->query($query);
-    } catch (Exception $e) {
-        throw $e;
-    } finally {
-        closeConnection($conn);
-    }
-}
-
-function delete($id)
-{
-
-    try {
-        $query = "DELETE FROM tb_cronjobwhatsapp WHERE id= $id";
         $conn = getConnection();
         return $conn->query($query);
     } catch (Exception $e) {
@@ -114,27 +144,26 @@ function delete($id)
 
 
 /**
- * Obtener los registros de la tabla tb_cronjobwhatsapp
+ * Obtener los registros de la tabla tb_cronjobwhatsapp_v2
  * @return array{
  * id: int,
- * message: string,
+ * id_order: string,
+ * full_name: string,
+ * amount: string,
+ * number_cell: string,
  * time_create: string,
- * time_update: string,
- * cell: string,
- * multimedia: boolean
+ * time_update: ?string
  * }[]
  * @throws Exception
  */
-function getList()
+function getListV2()
 {
     try {
-        $query = "SELECT id,message, time_create, time_update, cell, multimedia FROM tb_cronjobwhatsapp WHERE time_update IS  NULL LIMIT 50;";
+        $query = "SELECT id, id_order, full_name, amount, number_cell, time_create, time_update FROM tb_cronjobwhatsapp_v2 WHERE time_update IS NULL LIMIT 50;";
         $conn = getConnection();
         $rows = [];
         $result = $conn->query($query);
         while ($row = $result->fetch_assoc()) {
-            // casting de multimedia a boolean
-            $row['multimedia'] = (bool) $row['multimedia'];
             $rows[] = $row;
         }
         return $rows;
@@ -145,65 +174,59 @@ function getList()
     }
 }
 
-function alternarPuerto()
+function processWhatsappCronjobV2($timePause = 3)
 {
-    // $stateFile = "../public/files/lastport.file"; // Ruta al archivo de estado del puerto
+    $list = getListV2();
 
-    // // Leer el último puerto almacenado desde el archivo
-    // $ultimoPuerto = file_exists($stateFile) ? file_get_contents($stateFile) : null;
-    // $port1 = 8086;
-    $port2 = 8085;
+    if (count($list) == 0) {
+        echo "No hay registros para procesar";
+        return;
+    }
 
-    // // Alternar entre $port1 y $port2
-    // if ($ultimoPuerto === (string) $port1) {
-    //     $ultimoPuerto = $port2;
-    // } else {
-    //     $ultimoPuerto = $port1;
-    // }
+    foreach ($list as $item) {
+        $id = $item['id'];
+        $idOrder = $item['id_order'];
+        $fullName = $item['full_name'];
+        $amount = $item['amount'];
+        $numberCell = "57" . $item['number_cell'];
 
-    // // Guardar el último puerto utilizado en el archivo
-    // file_put_contents($stateFile, (string) $ultimoPuerto);
+        $payload = createCampaignTemplateContextBody($fullName, $idOrder, $amount);
+        $payload['to'] = $numberCell;
+        $payload['idSession'] = $numberCell;
+        sendWhatsappCampaignTemplateContext($payload);
+        updateV2($id);
 
-    // return $ultimoPuerto;
-    return $port2;
+        sleep($timePause);
+    }
 }
-
 
 function checkProcess()
 {
-    $stateFile = "../public/files/state.file"; // Ruta al archivo de estado
+    $stateFile = __DIR__ . "/../public/files/state.file"; // Ruta absoluta del archivo de estado
+    $stateDir = dirname($stateFile);
+
+    if (!is_dir($stateDir)) {
+        mkdir($stateDir, 0777, true);
+    }
+
+    if (!file_exists($stateFile)) {
+        file_put_contents($stateFile, "LIBRE");
+    }
 
     // Verificar si el proceso está OCUPADO
-    if (file_get_contents($stateFile) === "OCUPADO") {
+    if (trim((string) file_get_contents($stateFile)) === "OCUPADO") {
         return; // Salir si ya está ocupado
     }
 
     // Establecer el estado a OCUPADO
     file_put_contents($stateFile, "OCUPADO");
 
-    $timePause = 30;
-    $list = getList();
-
-    if (count($list) == 0) {
-        echo "No hay registros para procesar";
-        file_put_contents($stateFile, "LIBRE"); // Establecer el estado a LIBRE
-        return;
+    try {
+        processWhatsappCronjobV2(3);
+        echo "Tarea ejecutada";
+    } finally {
+        file_put_contents($stateFile, "LIBRE"); // Establecer el estado a LIBRE al final
     }
-
-    foreach ($list as $item) {
-        $id = $item['id'];
-        $message = $item['message'];
-        $cell = $item['cell'];
-        $isMultiMedia = $item['multimedia'];
-        $port = alternarPuerto();
-        sendWhatsapp($cell, $message, $port, $isMultiMedia);
-        notification($message);
-        update($id);
-        sleep($timePause); // pausar el proceso por $timePause segundos
-    }
-
-    echo "Tarea ejecutada";
-    file_put_contents($stateFile, "LIBRE"); // Establecer el estado a LIBRE al final
 }
 
 checkProcess();
