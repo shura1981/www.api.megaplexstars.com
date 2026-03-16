@@ -71,7 +71,7 @@ function createCampaignTemplateContextBody($fullName, $idOrder, $mount): array
                 ]
             ]
         ],
-        "agentId" => 1,
+        "agentId" => 5,
         "idSession" => "{{phoneNumberTemplateContext}}",
         "texto_cliente" => "",
         "texto_agente" => "Hola *$fullName* te escribimos de nutramerican.com. Tu pedido con el numero de pago *N $idOrder* por valor de *$mount* ha sido *APROBADO* y sera entregado lo mas pronto posible.",
